@@ -99,7 +99,54 @@ src/
 └── App.tsx             # Main application component
 ```
 
-## 🌐 API Integration
+## 🌐 API 42 School - Configurazione
+
+### 🚀 Setup Rapido
+
+#### 1. Crea un'Applicazione 42 School
+1. Vai su [42 OAuth Applications](https://profile.intra.42.fr/oauth/applications)
+2. Clicca "New Application"
+3. Compila i campi:
+   - **Name**: 42 Scoreboard (o il nome che preferisci)
+   - **Redirect URI**: `http://localhost:5174/auth/callback`
+   - **Scopes**: `public` (minimo richiesto)
+4. Salva e copia **Client ID** e **Client Secret**
+
+#### 2. Configura le Credenziali
+Modifica il file `.env` nella root del progetto:
+
+```env
+# API Configuration - Set to use real 42 School API  
+VITE_USE_REAL_API=true
+VITE_42_API_BASE_URL=https://api.intra.42.fr
+VITE_42_REDIRECT_URI=http://localhost:5174/auth/callback
+
+# Sostituisci con le tue credenziali reali
+VITE_42_CLIENT_ID=il_tuo_client_id
+VITE_42_CLIENT_SECRET=il_tuo_client_secret
+```
+
+#### 3. Avvia l'Applicazione
+```bash
+npm run dev
+```
+
+L'app ora userà l'API ufficiale di 42! Vedrai il pulsante **"Sign in with 42 School"** nella pagina di login.
+
+### 🔧 Endpoint API Supportati
+
+- **Autenticazione**: OAuth2 con gestione automatica dei token
+- **Studenti**: Cursus principale (ID 21) con livelli, progetti, wallet
+- **Poolers**: Piscine (ID 9) con date, campus, progressi
+- **Profili Utente**: Informazioni dettagliate per ogni utente
+
+### 🚨 Note Importanti
+
+- **Redirect URI**: Deve corrispondere esattamente a quella configurata nell'app 42
+- **Scopes**: `public` è sufficiente per accedere ai dati degli studenti
+- **CORS**: L'API 42 supporta richieste da localhost per sviluppo
+
+## 🌐 API Integration (English)
 
 ### Quick Start with Mock API
 The application comes with a comprehensive mock API that simulates the 42 School API behavior:

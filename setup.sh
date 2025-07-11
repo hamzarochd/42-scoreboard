@@ -1,60 +1,69 @@
 #!/bin/bash
 
-echo "🚀 42 Scoreboard Setup"
-echo "====================="
+echo "🚀 42 Scoreboard - Configurazione API"
+echo "===================================="
 echo ""
 
-# Check if .env exists
+# Verifica se il file .env esiste
 if [ ! -f .env ]; then
-    echo "📝 Creating .env file from template..."
+    echo "📝 Creazione file .env..."
     cp .env.example .env
-    echo "✅ .env file created!"
+    echo "✅ File .env creato!"
 else
-    echo "✅ .env file already exists"
+    echo "✅ File .env già esistente"
 fi
 
 echo ""
-echo "📋 Current API Configuration:"
+echo "📋 Configurazione attuale:"
 echo "VITE_USE_REAL_API=$(grep VITE_USE_REAL_API .env | cut -d '=' -f2)"
 echo ""
 
-# Check if using real API
+# Controlla se sta usando l'API reale
 USE_REAL_API=$(grep VITE_USE_REAL_API .env | cut -d '=' -f2)
 if [ "$USE_REAL_API" = "true" ]; then
-    echo "🔗 You're configured to use the REAL 42 School API"
+    echo "🔗 CONFIGURATO PER API UFFICIALE 42 SCHOOL"
     echo ""
-    echo "📍 Make sure you have:"
-    echo "   1. Created a 42 School OAuth application at:"
-    echo "      https://profile.intra.42.fr/oauth/applications"
-    echo "   2. Set your credentials in .env:"
-    echo "      - VITE_42_CLIENT_ID"
-    echo "      - VITE_42_CLIENT_SECRET"
-    echo "   3. Set redirect URI to: http://localhost:5173/auth/callback"
-    echo ""
-    echo "🚨 Your current configuration:"
-    CLIENT_ID=$(grep VITE_42_CLIENT_ID .env | cut -d '=' -f2)
-    if [ -z "$CLIENT_ID" ]; then
-        echo "   ❌ VITE_42_CLIENT_ID is not set"
-    else
-        echo "   ✅ VITE_42_CLIENT_ID is set"
-    fi
     
+    # Controlla le credenziali
+    CLIENT_ID=$(grep VITE_42_CLIENT_ID .env | cut -d '=' -f2)
     CLIENT_SECRET=$(grep VITE_42_CLIENT_SECRET .env | cut -d '=' -f2)
-    if [ -z "$CLIENT_SECRET" ]; then
-        echo "   ❌ VITE_42_CLIENT_SECRET is not set"
+    
+    if [ "$CLIENT_ID" = "your_client_id_here" ] || [ -z "$CLIENT_ID" ]; then
+        echo "❌ VITE_42_CLIENT_ID non configurato"
+        echo ""
+        echo "📋 PASSI PER CONFIGURARE L'API:"
+        echo "1. Vai su: https://profile.intra.42.fr/oauth/applications"
+        echo "2. Clicca 'New Application'"
+        echo "3. Nome: 42 Scoreboard"
+        echo "4. Redirect URI: http://localhost:5174/auth/callback"
+        echo "5. Scopes: public"
+        echo "6. Copia Client ID e Client Secret"
+        echo "7. Modifica il file .env con le tue credenziali"
+        echo ""
+        echo "🔧 Modifica .env:"
+        echo "VITE_42_CLIENT_ID=il_tuo_client_id"
+        echo "VITE_42_CLIENT_SECRET=il_tuo_client_secret"
     else
-        echo "   ✅ VITE_42_CLIENT_SECRET is set"
+        echo "✅ VITE_42_CLIENT_ID configurato"
+        
+        if [ "$CLIENT_SECRET" = "your_client_secret_here" ] || [ -z "$CLIENT_SECRET" ]; then
+            echo "❌ VITE_42_CLIENT_SECRET non configurato"
+            echo "🔧 Aggiungi il Client Secret nel file .env"
+        else
+            echo "✅ VITE_42_CLIENT_SECRET configurato"
+            echo ""
+            echo "🎉 TUTTO PRONTO! L'app userà l'API ufficiale di 42"
+            echo "� Avvia con: npm run dev"
+        fi
     fi
 else
-    echo "🎭 You're configured to use MOCK data (perfect for development!)"
+    echo "🎭 CONFIGURATO PER DATI MOCK (sviluppo)"
     echo ""
-    echo "📋 Demo credentials:"
-    echo "   Login: hmrochd"
-    echo "   Password: password"
-    echo ""
-    echo "🔄 To switch to real 42 API, change VITE_USE_REAL_API=true in .env"
+    echo "🔄 Per usare l'API ufficiale 42:"
+    echo "   Cambia VITE_USE_REAL_API=true nel file .env"
+    echo "   Poi aggiungi le tue credenziali 42"
 fi
 
 echo ""
-echo "🚀 Ready to start! Run: npm run dev"
+echo "� Per istruzioni complete: vedi README.md"
 echo ""
