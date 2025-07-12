@@ -34,7 +34,7 @@ export function usePoolers() {
       
       const response = await api.poolers.getPoolers(filters);
       
-      if (response.success) {
+      if (response.success && response.data) {
         setPoolers(response.data);
       }
     } catch (err) {
@@ -62,7 +62,7 @@ export function usePoolers() {
     const fetchPoolYears = async () => {
       try {
         const response = await api.poolers.getPoolYears();
-        if (response.success) {
+        if (response.success && response.data) {
           setPoolYears(response.data);
         }
       } catch (err) {

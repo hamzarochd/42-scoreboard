@@ -33,7 +33,7 @@ export function useStudents() {
       
       const response = await api.students.getStudents(filters);
       
-      if (response.success) {
+      if (response.success && response.data) {
         setStudents(response.data);
       }
     } catch (err) {
@@ -61,7 +61,7 @@ export function useStudents() {
     const fetchPromoYears = async () => {
       try {
         const response = await api.students.getPromoYears();
-        if (response.success) {
+        if (response.success && response.data) {
           setPromoYears(response.data);
         }
       } catch (err) {
