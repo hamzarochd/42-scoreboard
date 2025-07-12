@@ -19,6 +19,29 @@ const API_CONFIG = {
 };
 
 /**
+ * Validate API configuration on module load
+ */
+const validateApiConfig = () => {
+  const missing = [];
+  if (!API_CONFIG.clientId) missing.push('VITE_42_CLIENT_ID');
+  if (!API_CONFIG.clientSecret) missing.push('VITE_42_CLIENT_SECRET');
+  if (!API_CONFIG.redirectUri) missing.push('VITE_42_REDIRECT_URI');
+  
+  if (missing.length > 0) {
+    console.error('❌ Missing 42 API configuration:', missing);
+    console.error('Please set these environment variables in your .env file');
+  } else {
+    console.log('✅ 42 API configuration loaded:', {
+      baseUrl: API_CONFIG.baseUrl,
+      clientId: API_CONFIG.clientId.substring(0, 10) + '...',
+      redirectUri: API_CONFIG.redirectUri
+    });
+  }
+};
+
+validateApiConfig();
+
+/**
  * OAuth2 Token Management
  */
 class TokenManager {
@@ -275,34 +298,78 @@ export const ft42AuthApi = {
    * Exchange authorization code for access token
    */
   async exchangeCodeForToken(code: string): Promise<ApiResponse<User>> {
+    console.log('exchangeCodeForToken - Starting token exchange...');
+    console.log('API Config:', {
+      baseUrl: API_CONFIG.baseUrl,
+      clientId: API_CONFIG.clientId ? 'present' : 'missing',
+      clientSecret: API_CONFIG.clientSecret ? 'present' : 'missing',
+      redirectUri: API_CONFIG.redirectUri,
+      code: code ? 'present' : 'missing'
+    });
+
     try {
+      const tokenRequest = {
+        grant_type: 'authorization_code',
+        client_id: API_CONFIG.clientId,
+        client_secret: API_CONFIG.clientSecret,
+        code,
+        redirect_uri: API_CONFIG.redirectUri,
+      };
+
+      console.log('Token request payload:', {
+        ...tokenRequest,
+        client_secret: tokenRequest.client_secret ? 'present' : 'missing'
+      });
+
+      // Use form-encoded data as per OAuth2 spec
+      const formData = new URLSearchParams();
+      formData.append('grant_type', tokenRequest.grant_type);
+      formData.append('client_id', tokenRequest.client_id);
+      formData.append('client_secret', tokenRequest.client_secret);
+      formData.append('code', tokenRequest.code);
+      formData.append('redirect_uri', tokenRequest.redirect_uri);
+
       const response = await fetch(`${API_CONFIG.baseUrl}/oauth/token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          client_id: API_CONFIG.clientId,
-          client_secret: API_CONFIG.clientSecret,
-          code,
-          redirect_uri: API_CONFIG.redirectUri,
-        }),
+        body: formData,
       });
 
+      console.log('Token exchange response status:', response.status);
+      console.log('Token exchange response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error('Failed to exchange code for token');
+        const errorText = await response.text();
+        console.error('Token exchange error response:', errorText);
+        throw new Error(`Failed to exchange code for token: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const tokenData = await response.json();
+      console.log('Token exchange successful, received token data:', {
+        access_token: tokenData.access_token ? 'present' : 'missing',
+        refresh_token: tokenData.refresh_token ? 'present' : 'missing',
+        expires_in: tokenData.expires_in,
+        token_type: tokenData.token_type,
+        scope: tokenData.scope
+      });
+
       tokenManager.setTokens(
         tokenData.access_token, 
         tokenData.refresh_token, 
         tokenData.expires_in
       );
 
+      console.log('Getting user info...');
       // Get user info
       const userInfo = await apiClient.get<any>('/v2/me');
+      console.log('User info received:', {
+        id: userInfo.id,
+        login: userInfo.login,
+        email: userInfo.email
+      });
+
       const user = transformUser(userInfo);
 
       return {
@@ -311,7 +378,14 @@ export const ft42AuthApi = {
         message: 'Login successful',
       };
     } catch (error) {
-      throw new Error(`Authentication failed: ${error}`);
+      console.error('exchangeCodeForToken - Full error:', error);
+      console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+      console.error('Error message:', error instanceof Error ? error.message : String(error));
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      
+      // Return a more detailed error message
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Authentication failed: ${errorMessage}`);
     }
   },
 
