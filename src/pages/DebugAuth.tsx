@@ -5,6 +5,8 @@ import { API_CONFIG } from '@/services/ft42Api';
 export const DebugAuth: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [debugInfo, setDebugInfo] = useState<any>({});
+  const [serverEnv, setServerEnv] = useState<any>(null);
+  const [loadingServerEnv, setLoadingServerEnv] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +27,23 @@ export const DebugAuth: React.FC = () => {
       timestamp: new Date().toISOString(),
     });
   }, [searchParams]);
+
+  const testServerEnv = async () => {
+    setLoadingServerEnv(true);
+    try {
+      const response = await fetch('/api/debug-env');
+      if (response.ok) {
+        const data = await response.json();
+        setServerEnv(data);
+      } else {
+        setServerEnv({ error: 'Failed to fetch server environment' });
+      }
+    } catch (error) {
+      setServerEnv({ error: error instanceof Error ? error.message : 'Unknown error' });
+    } finally {
+      setLoadingServerEnv(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
@@ -94,6 +113,26 @@ export const DebugAuth: React.FC = () => {
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Server Environment Test */}
+            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+              <h2 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">
+                Server Environment Variables
+              </h2>
+              <button
+                onClick={testServerEnv}
+                disabled={loadingServerEnv}
+                className="mb-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loadingServerEnv ? 'Testing...' : 'Test Server Environment'}
+              </button>
+              
+              {serverEnv && (
+                <pre className="text-sm text-purple-700 dark:text-purple-300 whitespace-pre-wrap">
+                  {JSON.stringify(serverEnv, null, 2)}
+                </pre>
+              )}
             </div>
 
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">

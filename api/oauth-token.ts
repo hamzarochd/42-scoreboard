@@ -54,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code,
-        redirect_uri: redirect_uri || 'https://leeters.vercel.app/auth/callback',
+        redirect_uri: redirect_uri || 'https://leeters.vercel.app/oauth/callback',
       }),
     });
 
