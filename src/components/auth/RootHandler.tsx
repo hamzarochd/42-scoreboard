@@ -14,7 +14,7 @@ interface RootHandlerProps {
 export function RootHandler({ children }: RootHandlerProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loginWithOAuth } = useAuth();
   const [isProcessingCallback, setIsProcessingCallback] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,8 +47,12 @@ export function RootHandler({ children }: RootHandlerProps) {
       console.log('Processing OAuth callback with code');
       setIsProcessingCallback(true);
       handleOAuthCallback(code);
+    } else if (code && isAuthenticated) {
+      // If user is already authenticated but URL has OAuth params, clean the URL
+      console.log('User already authenticated, cleaning OAuth params from URL');
+      navigate('/', { replace: true });
     }
-  }, [location, navigate, isAuthenticated]);
+  }, [location, navigate, isAuthenticated, loginWithOAuth]);
 
   const handleOAuthCallback = async (code: string) => {
     console.log('Root Handler - Starting OAuth token exchange...');
@@ -72,6 +76,9 @@ export function RootHandler({ children }: RootHandlerProps) {
       
       if (response.success) {
         console.log('Root Handler - Authentication successful');
+        
+        // Update authentication state with the user data
+        await loginWithOAuth(response.data);
         
         // Get redirect destination
         const redirectTo = sessionStorage.getItem('redirectAfterLogin') || '/';
