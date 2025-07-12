@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ErrorBoundary, ProtectedRoute } from '@/components';
+import { ErrorBoundary, ProtectedRoute, RootHandler } from '@/components';
 import { Dashboard, Login, OAuthCallback, NotFound, ApiSetup } from '@/pages';
 import { logApiMode } from '@/services';
 
@@ -20,9 +20,11 @@ function App() {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
+              <RootHandler>
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              </RootHandler>
             }
           />
           <Route path="*" element={<NotFound />} />
