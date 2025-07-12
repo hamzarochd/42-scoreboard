@@ -35,3 +35,4 @@ export const logApiMode = () => {
 export * from './mockApi';
 export * from './mockData';
 export * from './ft42Api';
+export * from './simpleAuth';

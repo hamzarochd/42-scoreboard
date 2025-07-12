@@ -302,12 +302,20 @@ export const ft42AuthApi = {
     console.log('Config check:', {
       redirectUri: API_CONFIG.redirectUri,
       codePresent: !!code,
+      codeLength: code?.length,
       clientIdPresent: !!API_CONFIG.clientId,
+      clientSecretPresent: !!API_CONFIG.clientSecret,
+      baseUrl: API_CONFIG.baseUrl,
     });
 
     try {
       // First try serverless function (more secure)
       console.log('🚀 Attempting serverless function approach...');
+      console.log('Serverless request payload:', {
+        code: code.substring(0, 10) + '...',
+        redirect_uri: API_CONFIG.redirectUri,
+      });
+
       const serverlessResponse = await fetch('/api/oauth-token', {
         method: 'POST',
         headers: {
@@ -321,10 +329,17 @@ export const ft42AuthApi = {
       });
 
       console.log('📡 Serverless response status:', serverlessResponse.status);
+      console.log('📡 Serverless response headers:', Object.fromEntries(serverlessResponse.headers.entries()));
 
       if (serverlessResponse.ok) {
         const data = await serverlessResponse.json();
         console.log('✅ Serverless authentication successful');
+        console.log('Received data structure:', {
+          hasTokens: !!data.tokens,
+          hasUser: !!data.user,
+          tokenKeys: data.tokens ? Object.keys(data.tokens) : [],
+          userKeys: data.user ? Object.keys(data.user) : [],
+        });
 
         // Store tokens locally
         tokenManager.setTokens(
@@ -339,13 +354,22 @@ export const ft42AuthApi = {
           message: 'Login successful via serverless',
         };
       } else {
-        const errorData = await serverlessResponse.json().catch(() => ({ error: 'Unknown error' }));
-        console.warn('⚠️ Serverless function failed:', errorData);
-        throw new Error(`Serverless failed: ${errorData.error}`);
+        const errorText = await serverlessResponse.text();
+        console.warn('⚠️ Serverless function failed with status:', serverlessResponse.status);
+        console.warn('⚠️ Serverless error response:', errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText };
+        }
+        
+        throw new Error(`Serverless failed: ${errorData.error || 'Unknown error'}`);
       }
     } catch (serverlessError) {
       console.warn('🔄 Serverless approach failed, trying direct fallback...');
-      console.warn('Serverless error:', serverlessError);
+      console.warn('Serverless error details:', serverlessError);
       
       // Fallback to direct API call (less secure but functional)
       try {

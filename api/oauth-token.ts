@@ -17,21 +17,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    console.log('🔄 OAuth token exchange started');
+    console.log('Request headers:', req.headers);
+    console.log('Request body keys:', Object.keys(req.body || {}));
+
     const { code, redirect_uri } = req.body;
 
     if (!code) {
+      console.error('❌ No authorization code provided');
       res.status(400).json({ error: 'Authorization code is required' });
       return;
     }
+
+    console.log('✅ Authorization code received:', code.substring(0, 10) + '...');
+    console.log('✅ Redirect URI:', redirect_uri);
 
     // Use environment variables (without VITE_ prefix for server-side)
     const CLIENT_ID = process.env.VITE_42_CLIENT_ID;
     const CLIENT_SECRET = process.env.VITE_42_CLIENT_SECRET;
     const API_BASE_URL = process.env.VITE_42_API_BASE_URL || 'https://api.intra.42.fr';
 
+    console.log('Environment check:', {
+      hasClientId: !!CLIENT_ID,
+      hasClientSecret: !!CLIENT_SECRET,
+      clientIdLength: CLIENT_ID?.length || 0,
+      clientSecretLength: CLIENT_SECRET?.length || 0,
+      apiBaseUrl: API_BASE_URL,
+    });
+
     if (!CLIENT_ID || !CLIENT_SECRET) {
-      console.error('Missing OAuth credentials');
-      res.status(500).json({ error: 'Server configuration error' });
+      console.error('❌ Missing OAuth credentials');
+      res.status(500).json({ 
+        error: 'Server configuration error',
+        details: 'Missing CLIENT_ID or CLIENT_SECRET' 
+      });
       return;
     }
 
