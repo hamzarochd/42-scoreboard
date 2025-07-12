@@ -9,6 +9,16 @@ export const MOCK_API_DELAY = 500; // ms
 export const AUTH_STORAGE_KEY = '42_scoreboard_auth';
 export const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
 
+// OAuth2 Configuration for GitHub Codespaces
+export const OAUTH2_CONFIG = {
+  CLIENT_ID: 'u-s4t2ud-6b5ae25c98f81e975800cd30130f255d726649fa1f68fc4a0f5cc2168410bc65',
+  REDIRECT_URI: 'https://reimagined-space-fiesta-v7jwvj6gp6rfwpvq-5174.app.github.dev/oauth/callback',
+  SCOPE: 'public',
+  RESPONSE_TYPE: 'code',
+  AUTHORIZE_URL: 'https://api.intra.42.fr/oauth/authorize',
+  TOKEN_URL: 'https://api.intra.42.fr/oauth/token',
+};
+
 // Demo credentials
 export const DEMO_CREDENTIALS = {
   login: 'hmrochd',

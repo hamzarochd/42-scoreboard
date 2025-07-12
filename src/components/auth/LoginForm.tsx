@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { Lock, User, Eye, EyeOff, ExternalLink, Crown } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
 import { ft42AuthApi } from '@/services/ft42Api';
@@ -65,11 +65,11 @@ export function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-accent-500 rounded-xl flex items-center justify-center mb-6 accent-glow">
-            <Crown className="w-8 h-8 text-black" />
+          <div className="mx-auto mb-8 max-w-sm">
+            <img src="/logo.png" alt="Logo" className="w-full h-auto object-contain mx-auto" />
           </div>
           <h2 className="text-3xl font-bold text-white">
-            Sign in to <span className="accent-text">LEETERS</span>
+            Sign in
           </h2>
           <p className="mt-2 text-sm text-dark-500">
             {API_MODE === 'REAL' ? 
@@ -79,58 +79,9 @@ export function LoginForm() {
           </p>
         </div>
 
-        {/* API Configuration Warning */}
-        {API_MODE === 'REAL' && !isApiConfigured() && (
-          <div className="bg-yellow-900/20 border border-yellow-800 rounded-lg p-4">
-            <div className="flex">
-              <ExternalLink className="h-5 w-5 text-yellow-400" />
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-200">
-                  API 42 non configurata
-                </h3>
-                <p className="mt-2 text-sm text-yellow-300">
-                  Per usare l'API ufficiale di 42, devi configurare le credenziali nel file .env
-                </p>
-                <div className="mt-4">
-                  <a
-                    href="/api-setup"
-                    className="text-sm font-medium text-accent-500 underline hover:text-accent-400"
-                  >
-                    Guida alla configurazione →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* OAuth Login Button - Show when API is configured or in real mode */}
-        {API_MODE === 'REAL' && isApiConfigured() && (
+        {/* Show demo login in mock mode or as primary option */}
+        {API_MODE === 'MOCK' && (
           <div className="space-y-4">
-            <button
-              onClick={handleOAuthLogin}
-              className="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 focus:ring-offset-black transition-all duration-200 accent-glow"
-            >
-              <span className="mr-2 font-semibold">Accedi con 42 School</span>
-              <ExternalLink className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Show demo login only in mock mode or when API is not configured */}
-        {(API_MODE === 'MOCK' || !isApiConfigured()) && (
-          <div className="space-y-4">
-            {API_MODE === 'REAL' && (
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-dark-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-black text-dark-500">Oppure usa la demo</span>
-                </div>
-              </div>
-            )}
-
             <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
@@ -193,13 +144,11 @@ export function LoginForm() {
                 </div>
               )}
 
-              {(API_MODE === 'MOCK' || !isApiConfigured()) && (
-                <div className="bg-accent-500/10 border border-accent-500/30 rounded-lg p-4">
-                  <p className="text-sm text-accent-400">
-                    <strong>Credenziali demo:</strong> hmrochd / password
-                  </p>
-                </div>
-              )}
+              <div className="bg-accent-500/10 border border-accent-500/30 rounded-lg p-4">
+                <p className="text-sm text-accent-400">
+                  <strong>Credenziali demo:</strong> hmrochd / password
+                </p>
+              </div>
 
               <button
                 type="submit"
@@ -213,6 +162,41 @@ export function LoginForm() {
                 )}
               </button>
             </form>
+
+            {/* Optional OAuth section for mock mode */}
+            {isApiConfigured() && (
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-dark-300" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-black text-dark-500">Oppure</span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleOAuthLogin}
+                  className="group relative w-full flex justify-center items-center py-3 px-4 border border-dark-300 text-sm font-medium rounded-lg text-white bg-transparent hover:bg-dark-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 focus:ring-offset-black transition-all duration-200"
+                >
+                  <span className="mr-2">Accedi con 42 School</span>
+                  <ExternalLink className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* OAuth Login Button for real API mode */}
+        {API_MODE === 'REAL' && isApiConfigured() && (
+          <div className="space-y-4">
+            <button
+              onClick={handleOAuthLogin}
+              className="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 focus:ring-offset-black transition-all duration-200 accent-glow"
+            >
+              <span className="mr-2 font-semibold">Accedi con 42 School</span>
+              <ExternalLink className="h-4 w-4" />
+            </button>
           </div>
         )}
       </div>

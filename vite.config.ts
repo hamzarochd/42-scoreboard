@@ -9,4 +9,8 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  server: {
+    port: 5178,
+    host: true, // Enable access from external hosts (required for Codespaces)
+  },
 })

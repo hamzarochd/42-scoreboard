@@ -6,6 +6,7 @@ import {
   PoolerFilters,
   ApiResponse 
 } from '@/types';
+import { OAUTH2_CONFIG } from '@/utils/constants';
 
 /**
  * 42 School API Configuration
@@ -13,9 +14,9 @@ import {
  */
 export const API_CONFIG = {
   baseUrl: import.meta.env.VITE_42_API_BASE_URL || 'https://api.intra.42.fr',
-  clientId: import.meta.env.VITE_42_CLIENT_ID || '',
+  clientId: import.meta.env.VITE_42_CLIENT_ID || OAUTH2_CONFIG.CLIENT_ID,
   clientSecret: import.meta.env.VITE_42_CLIENT_SECRET || '',
-  redirectUri: import.meta.env.VITE_42_REDIRECT_URI || 'http://localhost:5173/oauth/callback',
+  redirectUri: import.meta.env.VITE_42_REDIRECT_URI || OAUTH2_CONFIG.REDIRECT_URI,
 };
 
 /**

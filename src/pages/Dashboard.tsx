@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Users, GraduationCap, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, useStudents, usePoolers } from '@/hooks';
 import { 
   LoadingSpinner, 
@@ -15,6 +16,7 @@ import { PROMO_YEARS, POOL_MONTHS, SORT_OPTIONS } from '@/utils/constants';
  */
 export function Dashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [viewType, setViewType] = useState<'students' | 'poolers'>('students');
 
   // Students data and filters
@@ -41,8 +43,11 @@ export function Dashboard() {
   const handleLogout = async () => {
     try {
       await logout();
+      navigate('/login'); // Reindirizza alla pagina di login
     } catch (error) {
       console.error('Logout failed:', error);
+      // Anche se il logout fallisce, reindirizza comunque
+      navigate('/login');
     }
   };
 

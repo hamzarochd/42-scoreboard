@@ -65,6 +65,19 @@
     @apply w-full px-3 py-2 border border-dark-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 bg-dark-100 text-white placeholder-dark-500;
   }
 
+  /* Select dropdown styling */
+  .custom-select {
+    @apply bg-gray-900/90 border-white/20 text-white;
+  }
+  
+  .custom-select option {
+    @apply bg-gray-900 text-white py-2;
+  }
+  
+  .custom-select option:checked {
+    @apply bg-accent-500 text-black;
+  }
+
   .accent-glow {
     @apply shadow-lg;
     box-shadow: 0 0 20px rgba(230, 198, 66, 0.3);
@@ -90,4 +103,22 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-accent-500;
+}
+
+/* Better styling for select dropdowns */
+select {
+  background-color: rgb(17 24 39 / 0.9) !important;
+  color: white !important;
+}
+
+select option {
+  background-color: rgb(17 24 39) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+}
+
+select option:checked,
+select option:hover {
+  background-color: rgb(230 198 66) !important;
+  color: black !important;
 }

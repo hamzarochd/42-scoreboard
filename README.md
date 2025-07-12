@@ -2,6 +2,22 @@
 
 A modern React application for displaying 42 School student and pooler rankings with a beautiful, responsive interface.
 
+## 🚀 Quick Start
+
+### 1. Setup Authentication
+1. Go to https://profile.intra.42.fr/oauth/applications
+2. Create a new application with redirect URI: `http://localhost:5173/oauth/callback`
+3. Copy `.env.example` to `.env` and add your credentials
+4. See [AUTH_SETUP.md](./AUTH_SETUP.md) for detailed instructions
+
+### 2. Install & Run
+```bash
+npm install
+npm run dev
+```
+
+**Redirect URI for 42 Intra:** `http://localhost:5173/oauth/callback`
+
 ## 🚀 Features
 
 ### Authentication
