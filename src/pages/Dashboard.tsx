@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Users, GraduationCap, LogOut } from 'lucide-react';
-import { useSimpleAuth } from '@/hooks/useSimpleAuth';
+import { useOAuth2 } from '@/hooks/useOAuth2';
 import { useStudents, usePoolers } from '@/hooks';
 import { 
   LoadingSpinner, 
@@ -15,7 +15,7 @@ import { PROMO_YEARS, POOL_MONTHS, SORT_OPTIONS } from '@/utils/constants';
  * Main dashboard page showing scoreboard
  */
 export function Dashboard() {
-  const { user, logout } = useSimpleAuth();
+  const { user, logout } = useOAuth2();
   const [viewType, setViewType] = useState<'students' | 'poolers'>('students');
 
   // Students data and filters
@@ -87,7 +87,7 @@ export function Dashboard() {
             {/* User Info and Actions */}
             <div className="flex items-center space-x-2 md:space-x-4">
               <span className="text-xs md:text-sm text-dark-500 hidden sm:block">
-                Welcome, {user?.firstName} {user?.lastName}
+                Welcome, {user?.first_name} {user?.last_name}
               </span>
               <button
                 onClick={handleLogout}

@@ -5,7 +5,7 @@ import { User, ApiResponse } from '@/types';
  */
 const OAUTH_CONFIG = {
   clientId: import.meta.env.VITE_42_CLIENT_ID || '',
-  redirectUri: import.meta.env.VITE_42_REDIRECT_URI || window.location.origin + '/oauth/callback',
+  redirectUri: import.meta.env.VITE_42_REDIRECT_URI || (typeof window !== 'undefined' ? window.location.origin + '/oauth/callback' : ''),
   baseUrl: 'https://api.intra.42.fr',
   scope: 'public'
 };

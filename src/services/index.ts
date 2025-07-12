@@ -36,3 +36,10 @@ export * from './mockApi';
 export * from './mockData';
 export * from './ft42Api';
 export * from './simpleAuth';
+
+// New OAuth2 system
+export * from './oauth2Config';
+export * from './oauth2Service';
+export * from './tokenManager';
+export * from './rateLimiter';
+export * from './apiClient';

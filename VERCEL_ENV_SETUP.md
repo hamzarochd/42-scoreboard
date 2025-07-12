@@ -1,55 +1,90 @@
-# Vercel Environment Variables Setup
+# Vercel Deployment Guide - OAuth2 Authentication
 
-## Required Environment Variables
+## 🔧 1. Configure 42 School Application
 
-Add these variables in your Vercel project settings:
+### Create OAuth2 Application:
+1. Go to https://profile.intra.42.fr/oauth/applications/new
+2. Fill the form:
+   - **Name**: `42 Scoreboard` (or your preferred name)
+   - **Redirect URI**: `https://leeters.vercel.app/auth/callback`
+   - **Scopes**: `public` (default)
+3. Click "Submit"
+4. Copy the **CLIENT_ID** and **CLIENT_SECRET**
+
+⚠️ **Important**: The redirect URI must be exactly `/auth/callback`
+
+## 🌐 2. Vercel Environment Variables
+
+Add these variables in your Vercel project:
+**Dashboard → Project → Settings → Environment Variables**
 
 ### Required Variables:
+```bash
+VITE_42_CLIENT_ID=your_42_client_id_here
+VITE_42_CLIENT_SECRET=your_42_client_secret_here  
+VITE_42_REDIRECT_URI=https://leeters.vercel.app/auth/callback
 ```
-VITE_42_CLIENT_ID=your_42_app_client_id
-VITE_42_CLIENT_SECRET=your_42_app_client_secret
-VITE_42_REDIRECT_URI=https://leeters.vercel.app/oauth/callback
+
+### Optional Variables (have defaults):
+```bash
+VITE_42_API_BASE_URL=https://api.intra.42.fr
 VITE_USE_REAL_API=true
 ```
 
-### Optional Variables:
-```
-VITE_42_API_BASE_URL=https://api.intra.42.fr
-```
+## 🚀 3. Deployment Steps
 
-## 42 School App Configuration
+1. **Set Environment Variables** in Vercel dashboard
+2. **Redeploy** your application (or it will auto-deploy on next push)
+3. **Test** the authentication flow at `https://leeters.vercel.app/login`
 
-Make sure your 42 School application is configured with:
-- **Redirect URI**: `https://leeters.vercel.app/oauth/callback`
-- **Scopes**: `public` (default)
+## 🔍 4. Testing & Debugging
 
-## Steps to Configure:
+### Test URLs:
+- **Login**: https://leeters.vercel.app/login
+- **Debug**: https://leeters.vercel.app/debug
+- **Status Check**: Check environment variables and OAuth config
 
-1. Go to your Vercel project dashboard
-2. Click on "Settings" → "Environment Variables"
-3. Add each variable with the correct values
-4. **IMPORTANT**: Redeploy your application after adding variables
+### Common Issues:
 
-## Testing:
+#### "Client ID not configured"
+- ✅ **Solution**: Add `VITE_42_CLIENT_ID` to Vercel environment variables
+- ✅ **Verify**: Check Vercel Dashboard → Settings → Environment Variables
 
-After deployment, test the OAuth flow:
-1. Visit `https://leeters.vercel.app`
-2. Click "Login with 42"
-3. If issues persist, visit `https://leeters.vercel.app/debug` for troubleshooting
-4. Use the "Test Server Environment" button to verify server-side variables
+#### "Redirect URI mismatch"  
+- ✅ **Solution**: Ensure 42 School app has exactly: `https://leeters.vercel.app/auth/callback`
+- ✅ **Verify**: Check your 42 School OAuth app settings
 
-## Common Issues:
+#### "Authentication failed"
+- ✅ **Solution**: Verify `VITE_42_CLIENT_SECRET` is correctly set in Vercel
+- ✅ **Check**: Use `/debug` page to see configuration status
 
-### "Authentication Failed"
-- Verify all environment variables are set correctly
-- Ensure redirect URI matches exactly between 42 app and Vercel
-- Check server environment using `/api/debug-env` endpoint
+#### "Failed to fetch"
+- ✅ **Solution**: Check network connectivity and API availability
+- ✅ **Debug**: Check browser console for detailed error messages
 
-### "Page not found" 
-- Make sure redirect URI is `/oauth/callback` not `/auth/callback`
-- Verify the route exists in App.tsx
+## 🛡️ Security Features
 
-### "Failed to fetch"
-- Check CORS configuration
-- Verify API endpoints are accessible
-- Test serverless functions deployment
+This OAuth2 implementation includes:
+- ✅ **PKCE** (Proof Key for Code Exchange) for enhanced security
+- ✅ **CSRF Protection** with state parameter validation
+- ✅ **Rate Limiting** (2 requests/second, 1200/hour)
+- ✅ **Automatic Token Refresh** (when supported by API)
+- ✅ **Secure Token Storage** with encryption
+- ✅ **Error Recovery** with automatic retry logic
+
+## 📚 OAuth2 Flow Overview
+
+1. **User clicks "Login with 42 School"**
+2. **Redirect to 42 School** with PKCE challenge
+3. **User authorizes** the application
+4. **42 School redirects back** to `/auth/callback` with code
+5. **Exchange code for token** using PKCE verifier
+6. **Store token securely** and fetch user profile
+7. **Redirect to dashboard** with authenticated session
+
+## 🔗 Useful Links
+
+- **42 OAuth Apps**: https://profile.intra.42.fr/oauth/applications
+- **42 API Documentation**: https://api.intra.42.fr/apidoc
+- **Vercel Dashboard**: https://vercel.com/dashboard
+- **Application URL**: https://leeters.vercel.app

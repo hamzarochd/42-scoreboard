@@ -1,48 +1,41 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ErrorBoundary } from '@/components';
-import { Dashboard, Login, NotFound, ApiSetup, DebugAuth, TestOAuth } from '@/pages';
-import { SimpleOAuthCallback } from '@/components/auth/SimpleOAuthCallback';
-import { useSimpleAuth } from '@/hooks/useSimpleAuth';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { ErrorBoundary, ProtectedRoute, PublicRoute } from '@/components';
+import { Dashboard, NotFound, ApiSetup, DebugAuth, TestOAuth, SimpleDebugAuth } from '@/pages';
+import { OAuth2Login } from '@/pages/OAuth2Login';
+import { OAuth2Callback } from '@/components/auth/OAuth2Callback';
 import { logApiMode } from '@/services';
 
 // Log API mode on app start
 logApiMode();
 
 /**
- * Protected Route Component
- */
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useSimpleAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Login />;
-  }
-
-  return <>{children}</>;
-};
-
-/**
- * Main App component
+ * Main App component with OAuth2 authentication
  */
 function App() {
   return (
     <ErrorBoundary>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/oauth/callback" element={<SimpleOAuthCallback />} />
+          {/* Public routes */}
+          <Route 
+            path="/login" 
+            element={
+              <PublicRoute>
+                <OAuth2Login />
+              </PublicRoute>
+            } 
+          />
+          
+          {/* OAuth2 callback route */}
+          <Route path="/auth/callback" element={<OAuth2Callback />} />
+          
+          {/* Debug and utility routes */}
           <Route path="/api-setup" element={<ApiSetup />} />
-          <Route path="/debug" element={<DebugAuth />} />
+          <Route path="/debug" element={<SimpleDebugAuth />} />
+          <Route path="/debug-old" element={<DebugAuth />} />
           <Route path="/test-oauth" element={<TestOAuth />} />
+          
+          {/* Protected routes */}
           <Route
             path="/"
             element={
@@ -51,6 +44,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* 404 route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
