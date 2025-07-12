@@ -298,19 +298,21 @@ export const ft42AuthApi = {
    * Exchange authorization code for access token using serverless proxy with fallback
    */
   async exchangeCodeForToken(code: string): Promise<ApiResponse<User>> {
-    console.log('exchangeCodeForToken - Starting token exchange...');
-    console.log('API Config:', {
+    console.log('🔄 Starting OAuth token exchange...');
+    console.log('Config check:', {
       redirectUri: API_CONFIG.redirectUri,
-      code: code ? 'present' : 'missing'
+      codePresent: !!code,
+      clientIdPresent: !!API_CONFIG.clientId,
     });
 
     try {
-      // First try serverless function
-      console.log('Attempting serverless function approach...');
-      const response = await fetch('/api/oauth-token', {
+      // First try serverless function (more secure)
+      console.log('🚀 Attempting serverless function approach...');
+      const serverlessResponse = await fetch('/api/oauth-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           code,
@@ -318,90 +320,85 @@ export const ft42AuthApi = {
         }),
       });
 
-      console.log('Serverless function response status:', response.status);
+      console.log('📡 Serverless response status:', serverlessResponse.status);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Token exchange successful via serverless function');
+      if (serverlessResponse.ok) {
+        const data = await serverlessResponse.json();
+        console.log('✅ Serverless authentication successful');
 
         // Store tokens locally
         tokenManager.setTokens(
           data.tokens.access_token,
-          data.tokens.refresh_token,
+          data.tokens.refresh_token || '',
           data.tokens.expires_in
         );
 
         return {
           success: true,
           data: data.user,
-          message: 'Login successful',
+          message: 'Login successful via serverless',
         };
       } else {
-        console.warn('Serverless function failed, trying direct approach...');
-        throw new Error('Serverless function unavailable');
+        const errorData = await serverlessResponse.json().catch(() => ({ error: 'Unknown error' }));
+        console.warn('⚠️ Serverless function failed:', errorData);
+        throw new Error(`Serverless failed: ${errorData.error}`);
       }
     } catch (serverlessError) {
-      console.warn('Serverless approach failed:', serverlessError);
+      console.warn('🔄 Serverless approach failed, trying direct fallback...');
+      console.warn('Serverless error:', serverlessError);
       
       // Fallback to direct API call (less secure but functional)
       try {
-        console.log('Using direct API fallback...');
+        console.log('🔗 Using direct OAuth2 fallback...');
         
-        const tokenRequest = {
+        const tokenRequest = new URLSearchParams({
           grant_type: 'authorization_code',
           client_id: API_CONFIG.clientId,
           client_secret: API_CONFIG.clientSecret,
           code,
           redirect_uri: API_CONFIG.redirectUri,
-        };
+        });
 
-        // Use form-encoded data as per OAuth2 spec
-        const formData = new URLSearchParams();
-        formData.append('grant_type', tokenRequest.grant_type);
-        formData.append('client_id', tokenRequest.client_id);
-        formData.append('client_secret', tokenRequest.client_secret);
-        formData.append('code', tokenRequest.code);
-        formData.append('redirect_uri', tokenRequest.redirect_uri);
-
-        const response = await fetch(`${API_CONFIG.baseUrl}/oauth/token`, {
+        const directResponse = await fetch(`${API_CONFIG.baseUrl}/oauth/token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
           },
-          body: formData,
+          body: tokenRequest,
         });
 
-        console.log('Direct API response status:', response.status);
+        console.log('📡 Direct API response status:', directResponse.status);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Direct API error response:', errorText);
-          throw new Error(`Failed to exchange code for token: ${response.status} ${response.statusText} - ${errorText}`);
+        if (!directResponse.ok) {
+          const errorText = await directResponse.text();
+          console.error('❌ Direct API error:', errorText);
+          throw new Error(`Token exchange failed: ${directResponse.status} - ${errorText}`);
         }
 
-        const tokenData = await response.json();
-        console.log('Token exchange successful via direct API');
+        const tokenData = await directResponse.json();
+        console.log('✅ Direct token exchange successful');
 
         tokenManager.setTokens(
           tokenData.access_token, 
-          tokenData.refresh_token, 
+          tokenData.refresh_token || '', 
           tokenData.expires_in
         );
 
         // Get user info
-        console.log('Getting user info...');
+        console.log('👤 Fetching user info...');
         const userInfo = await apiClient.get<any>('/v2/me');
         const user = transformUser(userInfo);
 
         return {
           success: true,
           data: user,
-          message: 'Login successful',
+          message: 'Login successful via direct API',
         };
+
       } catch (directError) {
-        console.error('Both serverless and direct approaches failed');
-        console.error('Serverless error:', serverlessError);
-        console.error('Direct API error:', directError);
+        console.error('💥 Both serverless and direct approaches failed');
+        console.error('Direct error:', directError);
         
         const errorMessage = directError instanceof Error ? directError.message : String(directError);
         throw new Error(`Authentication failed: ${errorMessage}`);

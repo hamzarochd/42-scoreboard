@@ -19,13 +19,13 @@ export const OAuthCallback: React.FC = () => {
 
       if (error) {
         console.error('OAuth error:', error);
-        navigate('/login?error=oauth_failed');
+        navigate(`/debug?error=${error}&source=oauth`);
         return;
       }
 
       if (!code) {
         console.error('No authorization code received');
-        navigate('/login?error=no_code');
+        navigate('/debug?error=no_code&source=oauth');
         return;
       }
 
@@ -39,7 +39,8 @@ export const OAuthCallback: React.FC = () => {
         }
       } catch (error) {
         console.error('OAuth callback error:', error);
-        navigate('/login?error=auth_failed');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        navigate(`/debug?error=auth_failed&details=${encodeURIComponent(errorMessage)}&source=callback`);
       }
     };
 

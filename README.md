@@ -108,7 +108,7 @@ src/
 2. Clicca "New Application"
 3. Compila i campi:
    - **Name**: 42 Scoreboard (o il nome che preferisci)
-   - **Redirect URI**: `http://localhost:5174/auth/callback`
+   - **Redirect URI**: `https://leeters.vercel.app/auth/callback`
    - **Scopes**: `public` (minimo richiesto)
 4. Salva e copia **Client ID** e **Client Secret**
 
@@ -119,7 +119,7 @@ Modifica il file `.env` nella root del progetto:
 # API Configuration - Set to use real 42 School API  
 VITE_USE_REAL_API=true
 VITE_42_API_BASE_URL=https://api.intra.42.fr
-VITE_42_REDIRECT_URI=http://localhost:5174/auth/callback
+VITE_42_REDIRECT_URI=https://leeters.vercel.app/auth/callback
 
 # Sostituisci con le tue credenziali reali
 VITE_42_CLIENT_ID=il_tuo_client_id
