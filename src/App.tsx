@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary, ProtectedRoute } from '@/components';
-import { Dashboard, Login, NotFound, ApiSetup } from '@/pages';
+import { Dashboard, Login, OAuthCallback, NotFound, ApiSetup } from '@/pages';
 import { logApiMode } from '@/services';
 
 // Log API mode on app start
@@ -15,6 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/api-setup" element={<ApiSetup />} />
           <Route
             path="/"

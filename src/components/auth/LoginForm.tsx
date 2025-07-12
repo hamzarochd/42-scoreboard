@@ -44,7 +44,15 @@ export function LoginForm() {
   };
 
   const handleOAuthLogin = () => {
-    const authUrl = ft42AuthApi.getAuthUrl();
+    // Store current location for redirect after login
+    const from = (location.state as any)?.from?.pathname || '/';
+    sessionStorage.setItem('redirectAfterLogin', from);
+    
+    // Generate and store state for security
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('oauthState', state);
+    
+    const authUrl = ft42AuthApi.getAuthUrl(state);
     window.location.href = authUrl;
   };
 

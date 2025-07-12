@@ -257,14 +257,15 @@ const transformPooler = (poolerData: any): Pooler => {
 export const ft42AuthApi = {
   /**
    * Get OAuth2 authorization URL
+   * @param state - Optional state parameter for CSRF protection
    */
-  getAuthUrl(): string {
+  getAuthUrl(state?: string): string {
     const params = new URLSearchParams({
       client_id: API_CONFIG.clientId,
       redirect_uri: API_CONFIG.redirectUri,
       response_type: 'code',
       scope: 'public',
-      state: Math.random().toString(36).substring(7), // CSRF protection
+      state: state || Math.random().toString(36).substring(7), // CSRF protection
     });
     
     return `${API_CONFIG.baseUrl}/oauth/authorize?${params.toString()}`;
