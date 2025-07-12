@@ -223,4 +223,4 @@ VITE_42_REDIRECT_URI=https://yourdomain.com/auth/callback
 
 **Important**: Update the redirect URI in your 42 application settings to match your production domain.
 
-## 🔧 Available Scripts
+## 🔧 Available Scripts# Force redeploy Sat Jul 12 16:13:36 UTC 2025

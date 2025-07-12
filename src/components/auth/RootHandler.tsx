@@ -87,13 +87,30 @@ export function RootHandler({ children }: RootHandlerProps) {
       }
     } catch (error) {
       console.error('Root Handler - OAuth callback error:', error);
-      setError(error instanceof Error ? error.message : 'Authentication failed');
+      
+      // Enhanced error handling with user-friendly messages
+      let errorMessage = 'Authentication failed';
+      if (error instanceof Error) {
+        if (error.message.includes('TypeError: Failed to fetch')) {
+          errorMessage = 'Network error: Unable to connect to authentication service. Please check your internet connection and try again.';
+        } else if (error.message.includes('invalid_grant')) {
+          errorMessage = 'Authentication code expired. Please try logging in again.';
+        } else if (error.message.includes('CORS')) {
+          errorMessage = 'Browser security restriction detected. Please try refreshing the page.';
+        } else if (error.message.includes('state mismatch')) {
+          errorMessage = 'Security validation failed. Please try logging in again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
       setIsProcessingCallback(false);
       
-      // Redirect to login after error
+      // Clean up URL and redirect to login after error
       setTimeout(() => {
         navigate('/login', { replace: true });
-      }, 3000);
+      }, 5000);
     }
   };
 

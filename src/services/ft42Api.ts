@@ -11,7 +11,7 @@ import {
  * 42 School API Configuration
  * You need to set these environment variables or replace with your actual API credentials
  */
-const API_CONFIG = {
+export const API_CONFIG = {
   baseUrl: import.meta.env.VITE_42_API_BASE_URL || 'https://api.intra.42.fr',
   clientId: import.meta.env.VITE_42_CLIENT_ID || '',
   clientSecret: import.meta.env.VITE_42_CLIENT_SECRET || '',
@@ -295,17 +295,18 @@ export const ft42AuthApi = {
   },
 
   /**
-   * Exchange authorization code for access token using serverless proxy
+   * Exchange authorization code for access token using serverless proxy with fallback
    */
   async exchangeCodeForToken(code: string): Promise<ApiResponse<User>> {
-    console.log('exchangeCodeForToken - Starting token exchange via serverless proxy...');
+    console.log('exchangeCodeForToken - Starting token exchange...');
     console.log('API Config:', {
       redirectUri: API_CONFIG.redirectUri,
       code: code ? 'present' : 'missing'
     });
 
     try {
-      // Use our serverless function to handle OAuth securely
+      // First try serverless function
+      console.log('Attempting serverless function approach...');
       const response = await fetch('/api/oauth-token', {
         method: 'POST',
         headers: {
@@ -319,33 +320,92 @@ export const ft42AuthApi = {
 
       console.log('Serverless function response status:', response.status);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Serverless function error:', errorData);
-        throw new Error(`Token exchange failed: ${errorData.error || 'Unknown error'}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Token exchange successful via serverless function');
+
+        // Store tokens locally
+        tokenManager.setTokens(
+          data.tokens.access_token,
+          data.tokens.refresh_token,
+          data.tokens.expires_in
+        );
+
+        return {
+          success: true,
+          data: data.user,
+          message: 'Login successful',
+        };
+      } else {
+        console.warn('Serverless function failed, trying direct approach...');
+        throw new Error('Serverless function unavailable');
       }
-
-      const data = await response.json();
-      console.log('Token exchange successful via serverless function');
-
-      // Store tokens locally
-      tokenManager.setTokens(
-        data.tokens.access_token,
-        data.tokens.refresh_token,
-        data.tokens.expires_in
-      );
-
-      return {
-        success: true,
-        data: data.user,
-        message: 'Login successful',
-      };
-    } catch (error) {
-      console.error('exchangeCodeForToken - Full error:', error);
+    } catch (serverlessError) {
+      console.warn('Serverless approach failed:', serverlessError);
       
-      // Return a more detailed error message
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new Error(`Authentication failed: ${errorMessage}`);
+      // Fallback to direct API call (less secure but functional)
+      try {
+        console.log('Using direct API fallback...');
+        
+        const tokenRequest = {
+          grant_type: 'authorization_code',
+          client_id: API_CONFIG.clientId,
+          client_secret: API_CONFIG.clientSecret,
+          code,
+          redirect_uri: API_CONFIG.redirectUri,
+        };
+
+        // Use form-encoded data as per OAuth2 spec
+        const formData = new URLSearchParams();
+        formData.append('grant_type', tokenRequest.grant_type);
+        formData.append('client_id', tokenRequest.client_id);
+        formData.append('client_secret', tokenRequest.client_secret);
+        formData.append('code', tokenRequest.code);
+        formData.append('redirect_uri', tokenRequest.redirect_uri);
+
+        const response = await fetch(`${API_CONFIG.baseUrl}/oauth/token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData,
+        });
+
+        console.log('Direct API response status:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Direct API error response:', errorText);
+          throw new Error(`Failed to exchange code for token: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+
+        const tokenData = await response.json();
+        console.log('Token exchange successful via direct API');
+
+        tokenManager.setTokens(
+          tokenData.access_token, 
+          tokenData.refresh_token, 
+          tokenData.expires_in
+        );
+
+        // Get user info
+        console.log('Getting user info...');
+        const userInfo = await apiClient.get<any>('/v2/me');
+        const user = transformUser(userInfo);
+
+        return {
+          success: true,
+          data: user,
+          message: 'Login successful',
+        };
+      } catch (directError) {
+        console.error('Both serverless and direct approaches failed');
+        console.error('Serverless error:', serverlessError);
+        console.error('Direct API error:', directError);
+        
+        const errorMessage = directError instanceof Error ? directError.message : String(directError);
+        throw new Error(`Authentication failed: ${errorMessage}`);
+      }
     }
   },
 
