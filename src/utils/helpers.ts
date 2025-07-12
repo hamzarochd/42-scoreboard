@@ -140,10 +140,23 @@ export const filterStudents = (
 /**
  * Filters poolers based on search and pool year
  */
+/**
+ * Get month name from month number
+ */
+const getMonthName = (monthNumber: string): string => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const monthIndex = parseInt(monthNumber) - 1;
+  return months[monthIndex] || '';
+};
+
 export const filterPoolers = (
   poolers: Pooler[],
   search: string,
-  poolYear: number | 'all'
+  poolYear: number | 'all',
+  poolMonth?: string
 ): Pooler[] => {
   return poolers.filter(pooler => {
     const matchesSearch = search === '' || 
@@ -152,7 +165,9 @@ export const filterPoolers = (
     
     const matchesPool = poolYear === 'all' || pooler.poolYear === poolYear;
     
-    return matchesSearch && matchesPool;
+    const matchesMonth = !poolMonth || pooler.poolMonth.includes(getMonthName(poolMonth));
+    
+    return matchesSearch && matchesPool && matchesMonth;
   });
 };
 

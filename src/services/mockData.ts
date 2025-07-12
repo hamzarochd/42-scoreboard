@@ -184,6 +184,70 @@ export const mockStudents: Student[] = [
       { id: '2', name: 'minishell', finalMark: 98, status: 'finished' },
     ],
   },
+  // 2025 Students
+  {
+    id: '9',
+    login: 'ngarcia',
+    firstName: 'Nicolas',
+    lastName: 'Garcia',
+    displayName: 'Nicolas Garcia',
+    email: 'ngarcia@student.42.fr',
+    avatar: generateAvatarUrl('ngarcia'),
+    level: 5.34,
+    promoYear: 2025,
+    wallet: 120,
+    evaluationPoints: 22,
+    status: { isOnline: true, location: 'c2r3p5' },
+    profileUrl: getProfileUrl('ngarcia'),
+    campus: 'Madrid',
+    cursusUsers: [{ cursusId: 21, level: 5.34 }],
+    projects: [
+      { id: '1', name: 'libft', finalMark: 98, status: 'finished' },
+      { id: '2', name: 'born2beroot', status: 'in_progress' },
+    ],
+  },
+  {
+    id: '10',
+    login: 'lbrown',
+    firstName: 'Luna',
+    lastName: 'Brown',
+    displayName: 'Luna Brown',
+    email: 'lbrown@student.42.fr',
+    avatar: generateAvatarUrl('lbrown'),
+    level: 7.89,
+    promoYear: 2025,
+    wallet: 280,
+    evaluationPoints: 15,
+    status: { isOnline: false, lastSeen: new Date(Date.now() - 3600000) },
+    profileUrl: getProfileUrl('lbrown'),
+    campus: 'Paris',
+    cursusUsers: [{ cursusId: 21, level: 7.89 }],
+    projects: [
+      { id: '1', name: 'libft', finalMark: 115, status: 'finished' },
+      { id: '2', name: 'ft_printf', finalMark: 89, status: 'finished' },
+      { id: '3', name: 'get_next_line', status: 'in_progress' },
+    ],
+  },
+  {
+    id: '11',
+    login: 'awhite',
+    firstName: 'Alex',
+    lastName: 'White',
+    displayName: 'Alex White',
+    email: 'awhite@student.42.fr',
+    avatar: generateAvatarUrl('awhite'),
+    level: 3.21,
+    promoYear: 2025,
+    wallet: 85,
+    evaluationPoints: 25,
+    status: { isOnline: true, location: 'c1r1p1' },
+    profileUrl: getProfileUrl('awhite'),
+    campus: 'Berlin',
+    cursusUsers: [{ cursusId: 21, level: 3.21 }],
+    projects: [
+      { id: '1', name: 'libft', status: 'in_progress' },
+    ],
+  },
 ];
 
 // Generate mock poolers data
@@ -321,7 +385,7 @@ export const mockPoolers: Pooler[] = [
 const generateMoreStudents = (count: number): Student[] => {
   const firstNames = ['John', 'Jane', 'Mike', 'Sarah', 'Tom', 'Lisa', 'Chris', 'Anna', 'David', 'Emily'];
   const lastNames = ['Smith', 'Johnson', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas'];
-  const years = [2020, 2021, 2022, 2023, 2024];
+  const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
   
   return Array.from({ length: count }, (_, i) => {
     const firstName = firstNames[i % firstNames.length];
@@ -356,17 +420,33 @@ const generateMoreStudents = (count: number): Student[] => {
 const generateMorePoolers = (count: number): Pooler[] => {
   const firstNames = ['Oliver', 'Emma', 'Liam', 'Sophia', 'Noah', 'Isabella', 'Ethan', 'Mia', 'Lucas', 'Charlotte'];
   const lastNames = ['Garcia', 'Martinez', 'Lopez', 'Gonzalez', 'Rodriguez', 'Hernandez', 'Perez', 'Sanchez', 'Ramirez', 'Torres'];
-  const months = ['July 2024', 'August 2024', 'September 2024'];
+  const months = [
+    'July 2019', 'August 2019', 'September 2019',
+    'January 2020', 'February 2020', 'March 2020', 'July 2020', 'August 2020', 'September 2020',
+    'January 2021', 'February 2021', 'March 2021', 'July 2021', 'August 2021', 'September 2021',
+    'January 2022', 'February 2022', 'March 2022', 'July 2022', 'August 2022', 'September 2022',
+    'January 2023', 'February 2023', 'March 2023', 'July 2023', 'August 2023', 'September 2023',
+    'July 2024', 'August 2024', 'September 2024', 'January 2025', 'February 2025', 'March 2025'
+  ];
+
+  const getMonthNumber = (monthName: string): string => {
+    const monthMap: { [key: string]: string } = {
+      'January': '01', 'February': '02', 'March': '03', 'April': '04',
+      'May': '05', 'June': '06', 'July': '07', 'August': '08',
+      'September': '09', 'October': '10', 'November': '11', 'December': '12'
+    };
+    return monthMap[monthName] || '01';
+  };
   
   return Array.from({ length: count }, (_, i) => {
     const firstName = firstNames[i % firstNames.length];
     const lastName = lastNames[Math.floor(i / firstNames.length) % lastNames.length];
     const login = `pooler${firstName.toLowerCase()}${i}`;
     const poolMonth = months[i % months.length];
-    const poolStartDate = poolMonth === 'July 2024' ? '2024-07-01' : 
-                         poolMonth === 'August 2024' ? '2024-08-01' : '2024-09-01';
-    const poolEndDate = poolMonth === 'July 2024' ? '2024-07-26' : 
-                       poolMonth === 'August 2024' ? '2024-08-30' : '2024-09-28';
+    const poolYear = parseInt(poolMonth.split(' ')[1]);
+    const monthName = poolMonth.split(' ')[0];
+    const poolStartDate = `${poolYear}-${getMonthNumber(monthName)}-01`;
+    const poolEndDate = `${poolYear}-${getMonthNumber(monthName)}-28`;
     
     return {
       id: `pooler_${i + 200}`,
@@ -378,7 +458,7 @@ const generateMorePoolers = (count: number): Pooler[] => {
       avatar: generateAvatarUrl(login),
       level: Math.random() * 8,
       poolMonth,
-      poolYear: 2024,
+      poolYear,
       status: {
         isOnline: Math.random() > 0.5,
         ...(Math.random() > 0.5 ? {} : { lastSeen: new Date(Date.now() - Math.random() * 86400000) }),

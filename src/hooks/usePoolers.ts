@@ -7,6 +7,7 @@ import { usePersistedFilters } from './useLocalStorage';
 const initialFilters: PoolerFilters = {
   search: '',
   poolYear: 'all',
+  poolMonth: undefined,
   sortBy: 'level',
   sortOrder: 'desc',
 };

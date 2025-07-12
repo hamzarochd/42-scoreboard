@@ -42,7 +42,7 @@ export function SortControls({
       <select
         value={sortBy}
         onChange={(e) => onSortByChange(e.target.value)}
-        className="pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+        className="pl-3 pr-8 py-2 border border-white/20 rounded-lg bg-white/5 backdrop-blur-sm text-white focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 text-sm transition-all duration-200"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -53,7 +53,7 @@ export function SortControls({
       
       <button
         onClick={toggleSortOrder}
-        className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+        className="p-2 border border-white/20 rounded-lg bg-white/5 backdrop-blur-sm text-white/70 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-accent-500/50 transition-all duration-200"
         aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
       >
         {getSortIcon()}

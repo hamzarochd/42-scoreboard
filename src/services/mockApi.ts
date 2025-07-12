@@ -159,12 +159,13 @@ export const poolersApi = {
       const {
         search = '',
         poolYear = 'all',
+        poolMonth,
         sortBy = 'level',
         sortOrder = 'desc'
       } = filters;
       
       // Apply filters
-      poolers = filterPoolers(poolers, search, poolYear);
+      poolers = filterPoolers(poolers, search, poolYear, poolMonth);
       
       // Apply sorting
       poolers = sortPoolers(poolers, sortBy, sortOrder);

@@ -3,14 +3,12 @@ import { Users, GraduationCap, LogOut } from 'lucide-react';
 import { useAuth, useStudents, usePoolers } from '@/hooks';
 import { 
   LoadingSpinner, 
-  ThemeToggle, 
-  ScoreboardGrid, 
-  StatsPanel,
+  StudentList,
   SearchBar,
   Select,
   SortControls
 } from '@/components';
-import { PROMO_YEARS, SORT_OPTIONS } from '@/utils/constants';
+import { PROMO_YEARS, POOL_MONTHS, SORT_OPTIONS } from '@/utils/constants';
 
 /**
  * Main dashboard page showing scoreboard
@@ -27,7 +25,6 @@ export function Dashboard() {
     filters: studentFilters,
     updateFilter: updateStudentFilter,
     resetFilters: resetStudentFilters,
-    stats: studentStats,
   } = useStudents();
 
   // Poolers data and filters
@@ -38,7 +35,6 @@ export function Dashboard() {
     filters: poolerFilters,
     updateFilter: updatePoolerFilter,
     resetFilters: resetPoolerFilters,
-    stats: poolerStats,
     poolYears,
   } = usePoolers();
 
@@ -64,33 +60,40 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/leeters-background.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="glass-header shadow-lg border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo and Title */}
+          <div className="flex justify-between items-center h-14 md:h-16">
+            {/* Logo */}
             <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-lg font-bold text-white">42</span>
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                42 Scoreboard
-              </h1>
+              <img 
+                src="/logo.png" 
+                alt="LEETERS Logo" 
+                className="h-8 md:h-10 w-auto"
+              />
             </div>
 
             {/* User Info and Actions */}
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <span className="text-xs md:text-sm text-dark-500 hidden sm:block">
                 Welcome, {user?.firstName} {user?.lastName}
               </span>
-              <ThemeToggle />
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                className="p-2 text-dark-500 hover:text-accent-500 transition-colors"
                 title="Logout"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>
@@ -98,74 +101,96 @@ export function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* View Toggle */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md border border-gray-200 dark:border-gray-700">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        {/* Tab Navigation */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex rounded-lg overflow-hidden shadow-lg glass-tab">
             <button
               onClick={() => setViewType('students')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+              className={`flex-1 flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-6 py-3 md:py-4 transition-all duration-300 ${
                 viewType === 'students'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-accent-500/20 text-accent-500 font-semibold backdrop-blur-sm border-accent-500/40'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
-              <GraduationCap className="w-4 h-4" />
-              <span>Students</span>
+              <GraduationCap className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="text-base md:text-lg">Students</span>
             </button>
             <button
               onClick={() => setViewType('poolers')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+              className={`flex-1 flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-6 py-3 md:py-4 transition-all duration-300 ${
                 viewType === 'poolers'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-accent-500/20 text-accent-500 font-semibold backdrop-blur-sm border-accent-500/40'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
-              <Users className="w-4 h-4" />
-              <span>Poolers</span>
+              <Users className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="text-base md:text-lg">Poolers</span>
             </button>
           </div>
         </div>
 
-        {/* Statistics Panel */}
-        <StatsPanel
-          studentStats={viewType === 'students' ? studentStats : undefined}
-          poolerStats={viewType === 'poolers' ? poolerStats : undefined}
-          type={viewType}
-        />
-
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-200 dark:border-gray-700">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Filters Section */}
+        <div className="glass-panel rounded-lg shadow-xl p-4 md:p-6 mb-6 md:mb-8">
+          <h2 className="text-base md:text-lg font-semibold text-white mb-4 md:mb-6">Filtri</h2>
+          
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 ${
+            viewType === 'poolers' ? 'lg:grid-cols-5' : ''
+          }`}>
             {/* Search */}
-            <SearchBar
-              value={viewType === 'students' ? studentFilters.search : poolerFilters.search}
-              onChange={(value) => 
-                viewType === 'students' 
-                  ? updateStudentFilter('search', value)
-                  : updatePoolerFilter('search', value)
-              }
-              placeholder={`Search ${viewType}...`}
-            />
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-sm font-medium text-white mb-2 md:mb-3">Cerca</label>
+              <SearchBar
+                value={viewType === 'students' ? studentFilters.search : poolerFilters.search}
+                onChange={(value) => 
+                  viewType === 'students' 
+                    ? updateStudentFilter('search', value)
+                    : updatePoolerFilter('search', value)
+                }
+                placeholder={`Cerca ${viewType}...`}
+              />
+            </div>
 
             {/* Year Filter */}
-            <Select
-              value={
-                viewType === 'students' 
-                  ? studentFilters.promoYear.toString()
-                  : poolerFilters.poolYear.toString()
-              }
-              onChange={(value) => 
-                viewType === 'students'
-                  ? updateStudentFilter('promoYear', value === 'all' ? 'all' : parseInt(value))
-                  : updatePoolerFilter('poolYear', value === 'all' ? 'all' : parseInt(value))
-              }
-              options={viewType === 'students' ? getPromoYearOptions() : getPoolYearOptions()}
-              label={viewType === 'students' ? 'Promotion Year' : 'Pool Year'}
-            />
+            <div>
+              <label className="block text-sm font-medium text-white mb-2 md:mb-3">
+                {viewType === 'students' ? 'Anno Promo' : 'Anno Pool'}
+              </label>
+              <Select
+                value={
+                  viewType === 'students' 
+                    ? studentFilters.promoYear.toString()
+                    : poolerFilters.poolYear.toString()
+                }
+                onChange={(value) => 
+                  viewType === 'students'
+                    ? updateStudentFilter('promoYear', value === 'all' ? 'all' : parseInt(value))
+                    : updatePoolerFilter('poolYear', value === 'all' ? 'all' : parseInt(value))
+                }
+                options={viewType === 'students' ? getPromoYearOptions() : getPoolYearOptions()}
+                label=""
+              />
+            </div>
+
+            {/* Month Filter - Only for poolers */}
+            {viewType === 'poolers' && (
+              <div>
+                <label className="block text-sm font-medium text-white mb-2 md:mb-3">Mese Pool</label>
+                <Select
+                  value={poolerFilters.poolMonth || 'all'}
+                  onChange={(value) => updatePoolerFilter('poolMonth', value === 'all' ? undefined : value)}
+                  options={[
+                    { value: 'all', label: 'Tutti i Mesi' },
+                    ...POOL_MONTHS.map(month => ({ value: month.value, label: month.label }))
+                  ]}
+                  label=""
+                />
+              </div>
+            )}
 
             {/* Sort Controls */}
-            <div className="md:col-span-2">
+            <div className={`sm:col-span-2 ${viewType === 'poolers' ? 'lg:col-span-2' : 'lg:col-span-2'}`}>
+              <label className="block text-sm font-medium text-white mb-2 md:mb-3">Ordinamento</label>
               <SortControls
                 sortBy={viewType === 'students' ? studentFilters.sortBy : poolerFilters.sortBy}
                 sortOrder={viewType === 'students' ? studentFilters.sortOrder : poolerFilters.sortOrder}
@@ -185,12 +210,12 @@ export function Dashboard() {
           </div>
 
           {/* Reset Filters */}
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 md:mt-6 flex justify-end">
             <button
               onClick={() => viewType === 'students' ? resetStudentFilters() : resetPoolerFilters()}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+              className="text-sm text-accent-500 hover:text-accent-400 transition-colors font-medium"
             >
-              Reset Filters
+              Reset Filtri
             </button>
           </div>
         </div>
@@ -198,14 +223,14 @@ export function Dashboard() {
         {/* Content */}
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" text={`Loading ${viewType}...`} />
+            <LoadingSpinner size="lg" text={`Caricamento ${viewType}...`} />
           </div>
         ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-            <p className="text-red-700 dark:text-red-400">{error}</p>
+          <div className="bg-red-900/20 border border-red-800 rounded-lg p-6 text-center">
+            <p className="text-red-400">{error}</p>
           </div>
         ) : (
-          <ScoreboardGrid
+          <StudentList
             students={viewType === 'students' ? students : undefined}
             poolers={viewType === 'poolers' ? poolers : undefined}
             type={viewType}

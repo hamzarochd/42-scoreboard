@@ -28,7 +28,7 @@ export function Select({ value, onChange, options, label, className = '' }: Sele
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="block w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+          className="block w-full pl-3 pr-10 py-2 border border-white/20 rounded-lg bg-white/5 backdrop-blur-sm text-white focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 appearance-none transition-all duration-200"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -37,7 +37,7 @@ export function Select({ value, onChange, options, label, className = '' }: Sele
           ))}
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <ChevronDown className="h-5 w-5 text-gray-400" />
+          <ChevronDown className="h-5 w-5 text-white/50" />
         </div>
       </div>
     </div>

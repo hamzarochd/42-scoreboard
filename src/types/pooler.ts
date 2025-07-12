@@ -27,6 +27,7 @@ export interface Pooler {
 export interface PoolerFilters {
   search: string;
   poolYear: number | 'all';
+  poolMonth?: string;
   sortBy: 'level' | 'name' | 'login';
   sortOrder: 'asc' | 'desc';
 }

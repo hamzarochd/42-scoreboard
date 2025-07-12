@@ -26,10 +26,24 @@ export const COLORS = {
 };
 
 // Promotion years available
-export const PROMO_YEARS = [2019, 2020, 2021, 2022, 2023, 2024];
+export const PROMO_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
 // Pool years/months
-export const POOL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024];
+export const POOL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
+export const POOL_MONTHS = [
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+];
 
 // Campus locations
 export const CAMPUSES = [
